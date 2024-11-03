@@ -19,45 +19,45 @@ def main_menu_ui():
     print("Select a category:")
     print("1: Molar Mass")
     print("2: Balance Reaction Equations")
+    print("0: Exit")
     return input("Enter choice ")
 
 
-def molar_mass_ui():
-    valid_choices = ['1', '2', '3']
-    response = ""
-    while (response not in valid_choices):
-        print("Select a category:")
-        print("1: Molar Mass")
-        print("2: Balance Reaction Equations")
-        print("3: Something else")
-        response = input("Enter choice ")
-        print(response)
-    return response
-
-
-def main_menu():
+def main_menu_mode():
     stop_program = False
     while (not stop_program):
         match main_menu_ui():
             case '1':
-                print("Molar Mass")
-                molar_mass()
+                molar_mass_mode()
             case '2':
                 print("Balance Reaction Equations")
             case '3':
                 print("Something else")
             case '0':
                 stop_program = True
-        #case _:
-        #    main_menu()
 
 
-def molar_mass():
-    print("Molar Mass. Enter the ")
-    break_down_formula("H2SO4")
+def molar_mass_mode():
+    # return_to_main = False
+    print("** Molar Mass mode **")
+    while (True):
+        print("Enter the formula. Optional - after a space enter the moles. Enter nothing to exit: ")
+        response = input()
+        if response == '':
+            return
+            # return_to_main = True
+        elif ' ' in response:  # if there is a space, separate the
+            formula, moles = response.split(" ")
+            mass = calc_total_mass(break_down_formula(formula)) * float(moles)
+            print(mass)
+            print()
+        else:  # if the response is just a formula without a mole
+            mass = calc_total_mass(break_down_formula(response))
+            print(mass)
+            print()
 
 
-'''Input a molecular formula returns a dictionary of the element and thier counts'''
+'''Input a molecular formula returns a dictionary of the element and their counts'''
 
 
 def break_down_formula(formula):
@@ -95,14 +95,14 @@ def break_down_formula(formula):
             else:
                 if not split[0].isnumeric():
                     elements.append(split)
-                #check for 2 digit number
+                # check for 2 digit number
                 elif split[1].isnumeric():
-                    #if both leading characters are digits
+                    # if both leading characters are digits
                     if split[0].isnumeric():
                         elements.append(split[2:])
                     else:
                         elements.append(split)
-                #if only 1st charcater is a digit
+                # if only 1st charcater is a digit
                 elif split[0].isnumeric():
                     elements.append(split[1:])
         formula = "".join(elements)
@@ -124,46 +124,12 @@ def break_down_formula(formula):
     return element_counts
 
 
-def break_down_formula_old(formula):
-    # TODO: Only supports 1 level of parenthesis
-    element_counts = {}
-    # Cu(NO3)2
-    #first, break down any parenthesis
-    if '(' in formula:
-        open_indices = [match.start() for match in re.finditer(r'\(', formula)]
-        close_indices = [match.start() for match in re.finditer(r'\)', formula)]
-        for i, index in enumerate(open_indices):
-            #look after parenthesis to see if there is a muliplier
-            pass
-        pass
-    else:
-        pass
-
-    # Spits the molecular formula into a list of strings. Uses uppercase letters to know where to divide the string.
-    element_strings = re.findall('[A-Z][^A-Z]*', formula)
-    print(element_strings)
-    for element in element_strings:
-        # splits the substring into a string of the letters (Atomic Symbol) and number (amount of atoms)
-        #  also discards any empty strings
-        element_split = [part for part in re.split(r'(\d+)', element) if part != '']
-        # if there is no number associdated with the element, give it a count of '1'
-        if len(element_split) == 1: element_split.append('1')
-        # add the element to the dictionary and add the count to that key's value
-        if element_split[0] in element_counts:
-            element_counts[element_split[0]] += int(element_split[1])
-        else:
-            element_counts[element_split[0]] = int(element_split[1])
-    return element_counts
-
-
-def element_masses(element_dict):
+def calc_total_mass(element_dict):
     total_mass = 0
     for element in element_dict:
-        #look up the mass of the element and add the mass * the count to the mass total
+        # look up the mass of the element and add the mass * the count to the mass total
         total_mass += atomic_masses[element] * element_dict[element]
     return total_mass
 
 
-#main_menu()
-print(break_down_formula("Cu(NO3)2H2O"))
-print(element_masses(break_down_formula("Cu(NO3)2H2O")))
+main_menu_mode()
